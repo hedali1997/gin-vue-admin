@@ -1,14 +1,78 @@
 package community
 
 import (
+	"errors"
+	"fmt"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/community"
 	communityReq "github.com/flipped-aurora/gin-vue-admin/server/model/community/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
 type CommunityUserService struct {
+}
+
+func (communityUserService *CommunityUserService) Register(u community.CommunityUser) (userInter community.CommunityUser, err error) {
+	var user community.CommunityUser
+	if !errors.Is(global.GVA_DB.Where("user_name = ?", u.UserName).First(&user).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return userInter, errors.New("用户名已被使用")
+	}
+
+	if !errors.Is(global.GVA_DB.Where("phone = ?", u.Phone).First(&user).Error, gorm.ErrRecordNotFound) { // 判断手机号是否注册
+		return userInter, errors.New("手机号已注册")
+	}
+
+	// 否则 附加uuid 密码hash加密 注册
+	u.Password = utils.BcryptHash(u.Password)
+	u.UUID = uuid.NewV4()
+	err = global.GVA_DB.Create(&u).Error
+	return u, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@author: [SliverHorn](https://github.com/SliverHorn)
+//@function: Login
+//@description: 用户登录
+//@param: u *model.SysUser
+//@return: err error, userInter *model.SysUser
+
+func (communityUserService *CommunityUserService) Login(u *community.CommunityUser) (userInter *community.CommunityUser, err error) {
+	if nil == global.GVA_DB {
+		return nil, fmt.Errorf("db not init")
+	}
+
+	var user community.CommunityUser
+	err = global.GVA_DB.Where("phone = ?", u.Phone).First(&user).Error
+	if err == nil {
+		if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
+			return nil, errors.New("密码错误")
+		}
+		//MenuServiceApp.UserAuthorityDefaultRouter(&user)
+	}
+	return &user, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: ChangePassword
+//@description: 修改用户密码
+//@param: u *model.SysUser, newPassword string
+//@return: userInter *model.SysUser,err error
+
+func (communityUserService *CommunityUserService) ChangePassword(u *community.CommunityUser, newPassword string) (userInter *community.CommunityUser, err error) {
+	var user community.CommunityUser
+	if err = global.GVA_DB.Where("id = ?", u.ID).First(&user).Error; err != nil {
+		return nil, err
+	}
+	if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
+		return nil, errors.New("原密码错误")
+	}
+	user.Password = utils.BcryptHash(newPassword)
+	err = global.GVA_DB.Save(&user).Error
+	return &user, err
+
 }
 
 // CreateCommunityUser 创建CommunityUser记录

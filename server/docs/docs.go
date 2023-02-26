@@ -1530,7 +1530,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.LoginResponse"
+                                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse"
                                         },
                                         "msg": {
                                             "type": "string"
@@ -1634,6 +1634,227 @@ var doc = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/response.PolicyPathResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/community/changePassword": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "社区用户修改密码",
+                "parameters": [
+                    {
+                        "description": "用户名, 原密码, 新密码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.ChangePasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户修改密码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/community/user_register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "用户注册账号",
+                "parameters": [
+                    {
+                        "description": "用户名, 昵称, 密码, 角色ID",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户注册账号,返回包括用户信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.UserResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/communityBase/captcha": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "communityBase"
+                ],
+                "summary": "生成验证码",
+                "responses": {
+                    "200": {
+                        "description": "生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CaptchaResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/communityBase/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityBase"
+                ],
+                "summary": "用户登录",
+                "parameters": [
+                    {
+                        "description": "手机号, 验证码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PhoneCodeLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回包括用户信息,token,过期时间",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_response.LoginResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/communityBase/sendCode": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "communityBase"
+                ],
+                "summary": "生成验证码",
+                "responses": {
+                    "200": {
+                        "description": "生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CodeResponse"
                                         },
                                         "msg": {
                                             "type": "string"
@@ -1851,6 +2072,11 @@ var doc = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "更新时间",
                         "name": "updatedAt",
@@ -1864,6 +2090,11 @@ var doc = `{
                     {
                         "type": "string",
                         "name": "userName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "uuid",
                         "in": "query"
                     }
                 ],
@@ -1996,6 +2227,11 @@ var doc = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "更新时间",
                         "name": "updatedAt",
@@ -2009,6 +2245,11 @@ var doc = `{
                     {
                         "type": "string",
                         "name": "userName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "uuid",
                         "in": "query"
                     }
                 ],
@@ -4624,7 +4865,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.Register"
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_system_request.Register"
                         }
                     }
                 ],
@@ -4674,7 +4915,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.ChangePasswordReq"
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_system_request.ChangePasswordReq"
                         }
                     }
                 ],
@@ -5096,6 +5337,9 @@ var doc = `{
                 "school": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "integer"
+                },
                 "updatedAt": {
                     "description": "更新时间",
                     "type": "string"
@@ -5104,6 +5348,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "userName": {
+                    "type": "string"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -5816,6 +6063,10 @@ var doc = `{
                     "description": "数据库类型:mysql(默认)|sqlite|sqlserver|postgresql",
                     "type": "string"
                 },
+                "debug": {
+                    "description": "开启debug?0|1",
+                    "type": "integer"
+                },
                 "env": {
                     "description": "环境值",
                     "type": "string"
@@ -6064,6 +6315,122 @@ var doc = `{
                 }
             }
         },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_community_request.ChangePasswordReq": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "description": "新密码",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                }
+            }
+        },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register": {
+            "type": "object",
+            "properties": {
+                "check_passWord": {
+                    "type": "string",
+                    "example": "确认密码"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "密码"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "手机号"
+                },
+                "user_name": {
+                    "type": "string",
+                    "example": "手机号"
+                }
+            }
+        },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_community_response.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/community.CommunityUser"
+                }
+            }
+        },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_system_request.ChangePasswordReq": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "description": "新密码",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                }
+            }
+        },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_system_request.Register": {
+            "type": "object",
+            "properties": {
+                "authorityId": {
+                    "type": "string",
+                    "example": "int 角色id"
+                },
+                "authorityIds": {
+                    "type": "string",
+                    "example": "[]uint 角色id"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "电子邮箱"
+                },
+                "enable": {
+                    "type": "string",
+                    "example": "int 是否启用"
+                },
+                "headerImg": {
+                    "type": "string",
+                    "example": "头像链接"
+                },
+                "nickName": {
+                    "type": "string",
+                    "example": "昵称"
+                },
+                "passWord": {
+                    "type": "string",
+                    "example": "密码"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "电话号码"
+                },
+                "userName": {
+                    "type": "string",
+                    "example": "用户名"
+                }
+            }
+        },
+        "github.com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/system.SysUser"
+                }
+            }
+        },
         "request.AddMenuAuthorityInfo": {
             "type": "object",
             "properties": {
@@ -6103,19 +6470,6 @@ var doc = `{
                 },
                 "path": {
                     "description": "路径",
-                    "type": "string"
-                }
-            }
-        },
-        "request.ChangePasswordReq": {
-            "type": "object",
-            "properties": {
-                "newPassword": {
-                    "description": "新密码",
-                    "type": "string"
-                },
-                "password": {
-                    "description": "密码",
                     "type": "string"
                 }
             }
@@ -6223,44 +6577,37 @@ var doc = `{
                 }
             }
         },
-        "request.Register": {
+        "request.PhoneCodeLogin": {
             "type": "object",
             "properties": {
-                "authorityId": {
-                    "type": "string",
-                    "example": "int 角色id"
-                },
-                "authorityIds": {
-                    "type": "string",
-                    "example": "[]uint 角色id"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "电子邮箱"
-                },
-                "enable": {
-                    "type": "string",
-                    "example": "int 是否启用"
-                },
-                "headerImg": {
-                    "type": "string",
-                    "example": "头像链接"
-                },
-                "nickName": {
-                    "type": "string",
-                    "example": "昵称"
-                },
-                "passWord": {
-                    "type": "string",
-                    "example": "密码"
+                "code": {
+                    "description": "短信验证码",
+                    "type": "string"
                 },
                 "phone": {
-                    "type": "string",
-                    "example": "电话号码"
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "request.PhoneLogin": {
+            "type": "object",
+            "properties": {
+                "captcha": {
+                    "description": "验证码",
+                    "type": "string"
                 },
-                "userName": {
-                    "type": "string",
-                    "example": "用户名"
+                "captchaId": {
+                    "description": "验证码ID",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "用户名",
+                    "type": "string"
                 }
             }
         },
@@ -6388,6 +6735,34 @@ var doc = `{
                 }
             }
         },
+        "response.CaptchaResponse": {
+            "type": "object",
+            "properties": {
+                "captchaId": {
+                    "type": "string"
+                },
+                "captchaLength": {
+                    "type": "integer"
+                },
+                "openCaptcha": {
+                    "type": "boolean"
+                },
+                "picPath": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CodeResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Email": {
             "type": "object",
             "properties": {
@@ -6434,20 +6809,6 @@ var doc = `{
             "properties": {
                 "file": {
                     "$ref": "#/definitions/example.ExaFile"
-                }
-            }
-        },
-        "response.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "expiresAt": {
-                    "type": "integer"
-                },
-                "token": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/system.SysUser"
                 }
             }
         },
@@ -6603,6 +6964,14 @@ var doc = `{
             "properties": {
                 "user": {
                     "$ref": "#/definitions/system.SysUser"
+                }
+            }
+        },
+        "response.UserResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/community.CommunityUser"
                 }
             }
         },

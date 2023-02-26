@@ -74,6 +74,7 @@ func Routers() *gin.Engine {
 	{
 		communityRouter := router.RouterGroupApp.Community
 		communityRouter.InitCommunityUserRouter(PrivateGroup)
+		communityRouter.InitBaseRouter(PublicGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")
