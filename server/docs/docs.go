@@ -1646,98 +1646,6 @@ var doc = `{
                 }
             }
         },
-        "/community/changePassword": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Community"
-                ],
-                "summary": "社区用户修改密码",
-                "parameters": [
-                    {
-                        "description": "用户名, 原密码, 新密码",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.ChangePasswordReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "用户修改密码",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "msg": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/community/user_register": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Community"
-                ],
-                "summary": "用户注册账号",
-                "parameters": [
-                    {
-                        "description": "用户名, 昵称, 密码, 角色ID",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "用户注册账号,返回包括用户信息",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/response.UserResponse"
-                                        },
-                                        "msg": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/communityBase/captcha": {
             "post": {
                 "security": [
@@ -1780,7 +1688,54 @@ var doc = `{
                 }
             }
         },
-        "/communityBase/login": {
+        "/communityBase/changePassword": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "communityBase"
+                ],
+                "summary": "社区用户修改密码",
+                "parameters": [
+                    {
+                        "description": "用户名, 原密码, 新密码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.ChangePasswordReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户修改密码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/communityBase/codeLogin": {
             "post": {
                 "produces": [
                     "application/json"
@@ -1788,7 +1743,7 @@ var doc = `{
                 "tags": [
                     "CommunityBase"
                 ],
-                "summary": "用户登录",
+                "summary": "社区用户短信验证登录",
                 "parameters": [
                     {
                         "description": "手机号, 验证码",
@@ -1825,6 +1780,96 @@ var doc = `{
                 }
             }
         },
+        "/communityBase/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityBase"
+                ],
+                "summary": "社区用户手机号密码登录",
+                "parameters": [
+                    {
+                        "description": "手机号, 密码, 验证码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PhoneLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回包括用户信息,token,过期时间",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_response.LoginResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/communityBase/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "communityBase"
+                ],
+                "summary": "社区用户注册账号",
+                "parameters": [
+                    {
+                        "description": "用户名, 昵称, 密码, 角色ID",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户注册账号,返回包括用户信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.RegisterResponse"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/communityBase/sendCode": {
             "post": {
                 "security": [
@@ -1833,7 +1878,7 @@ var doc = `{
                     }
                 ],
                 "consumes": [
-                    "application/json"
+                    "application/x-www-form-urlencoded"
                 ],
                 "produces": [
                     "application/json"
@@ -1841,10 +1886,26 @@ var doc = `{
                 "tags": [
                     "communityBase"
                 ],
-                "summary": "生成验证码",
+                "summary": "发送短信验证码",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "手机号",
+                        "name": "phone",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "类型",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码",
+                        "description": "发送短信验证码",
                         "schema": {
                             "allOf": [
                                 {
@@ -5290,6 +5351,51 @@ var doc = `{
         }
     },
     "definitions": {
+        "community.ApiCommunityUser": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "birthday": {
+                    "type": "string"
+                },
+                "education": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "主键ID",
+                    "type": "integer"
+                },
+                "major": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "reamrk": {
+                    "type": "string"
+                },
+                "school": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "userName": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
         "community.CommunityUser": {
             "type": "object",
             "properties": {
@@ -6335,6 +6441,10 @@ var doc = `{
                     "type": "string",
                     "example": "确认密码"
                 },
+                "code": {
+                    "type": "string",
+                    "example": "短信验证码"
+                },
                 "password": {
                     "type": "string",
                     "example": "密码"
@@ -6345,7 +6455,7 @@ var doc = `{
                 },
                 "user_name": {
                     "type": "string",
-                    "example": "手机号"
+                    "example": "用户名"
                 }
             }
         },
@@ -6359,7 +6469,7 @@ var doc = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/community.CommunityUser"
+                    "$ref": "#/definitions/community.ApiCommunityUser"
                 }
             }
         },
@@ -6840,6 +6950,14 @@ var doc = `{
                 }
             }
         },
+        "response.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/community.ApiCommunityUser"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -6964,14 +7082,6 @@ var doc = `{
             "properties": {
                 "user": {
                     "$ref": "#/definitions/system.SysUser"
-                }
-            }
-        },
-        "response.UserResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "$ref": "#/definitions/community.CommunityUser"
                 }
             }
         },

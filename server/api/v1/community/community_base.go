@@ -63,11 +63,13 @@ func (b *CommunityBaseApi) Captcha(c *gin.Context) {
 
 // SendCode
 // @Tags      communityBase
-// @Summary   生成验证码
+// @Summary   发送短信验证码
 // @Security  ApiKeyAuth
-// @accept    application/json
+// @accept    application/x-www-form-urlencoded
 // @Produce   application/json
-// @Success   200  {object}  response.Response{data=communityRes.CodeResponse,msg=string}  "生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码"
+// @Param     phone  formData   string   true  "手机号"
+// @Param     type   formData   string   true  "类型：Register,PhoneCodeLogin"
+// @Success   200  {object}  response.Response{data=communityRes.CodeResponse,msg=string}  "发送短信验证码"
 // @Router    /communityBase/sendCode [post]
 func (b *CommunityBaseApi) SendCode(c *gin.Context) {
 	phone := c.PostForm("phone")

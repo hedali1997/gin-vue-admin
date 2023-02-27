@@ -29,6 +29,7 @@ type CommunityUser struct {
 }
 
 type ApiCommunityUser struct {
+	ID        uint       `gorm:"primarykey"` // 主键ID
 	UUID      uuid.UUID  `json:"uuid" form:"uuid" gorm:"column:uuid;comment:;size:255;"`
 	Nickname  string     `json:"nickname" form:"nickname" gorm:"column:nickname;comment:;size:60;"`
 	UserName  string     `json:"userName" form:"userName" gorm:"column:user_name;comment:用户名;size:60;"`

@@ -1,5 +1,35 @@
 basePath: /
 definitions:
+  community.ApiCommunityUser:
+    properties:
+      avatar:
+        type: string
+      birthday:
+        type: string
+      education:
+        type: integer
+      email:
+        type: string
+      id:
+        description: 主键ID
+        type: integer
+      major:
+        type: string
+      nickname:
+        type: string
+      phone:
+        type: string
+      reamrk:
+        type: string
+      school:
+        type: string
+      status:
+        type: integer
+      userName:
+        type: string
+      uuid:
+        type: string
+    type: object
   community.CommunityUser:
     properties:
       avatar:
@@ -737,6 +767,9 @@ definitions:
       check_passWord:
         example: 确认密码
         type: string
+      code:
+        example: 短信验证码
+        type: string
       password:
         example: 密码
         type: string
@@ -744,7 +777,7 @@ definitions:
         example: 手机号
         type: string
       user_name:
-        example: 手机号
+        example: 用户名
         type: string
     type: object
   github.com_flipped-aurora_gin-vue-admin_server_model_community_response.LoginResponse:
@@ -754,7 +787,7 @@ definitions:
       token:
         type: string
       user:
-        $ref: '#/definitions/community.CommunityUser'
+        $ref: '#/definitions/community.ApiCommunityUser'
     type: object
   github.com_flipped-aurora_gin-vue-admin_server_model_system_request.ChangePasswordReq:
     properties:
@@ -1084,6 +1117,11 @@ definitions:
           $ref: '#/definitions/request.CasbinInfo'
         type: array
     type: object
+  response.RegisterResponse:
+    properties:
+      user:
+        $ref: '#/definitions/community.ApiCommunityUser'
+    type: object
   response.Response:
     properties:
       code:
@@ -1164,11 +1202,6 @@ definitions:
     properties:
       user:
         $ref: '#/definitions/system.SysUser'
-    type: object
-  response.UserResponse:
-    properties:
-      user:
-        $ref: '#/definitions/community.CommunityUser'
     type: object
   system.AutoCodeStruct:
     properties:
@@ -2579,7 +2612,30 @@ paths:
       summary: 获取权限列表
       tags:
       - Casbin
-  /community/changePassword:
+  /communityBase/captcha:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CaptchaResponse'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 生成验证码
+      tags:
+      - communityBase
+  /communityBase/changePassword:
     post:
       parameters:
       - description: 用户名, 原密码, 新密码
@@ -2604,57 +2660,8 @@ paths:
       - ApiKeyAuth: []
       summary: 社区用户修改密码
       tags:
-      - Community
-  /community/user_register:
-    post:
-      parameters:
-      - description: 用户名, 昵称, 密码, 角色ID
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 用户注册账号,返回包括用户信息
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/response.UserResponse'
-                msg:
-                  type: string
-              type: object
-      summary: 用户注册账号
-      tags:
-      - Community
-  /communityBase/captcha:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/response.CaptchaResponse'
-                msg:
-                  type: string
-              type: object
-      security:
-      - ApiKeyAuth: []
-      summary: 生成验证码
-      tags:
       - communityBase
-  /communityBase/login:
+  /communityBase/codeLogin:
     post:
       parameters:
       - description: 手机号, 验证码
@@ -2677,18 +2684,81 @@ paths:
                 msg:
                   type: string
               type: object
-      summary: 用户登录
+      summary: 社区用户短信验证登录
       tags:
       - CommunityBase
-  /communityBase/sendCode:
+  /communityBase/login:
     post:
-      consumes:
-      - application/json
+      parameters:
+      - description: 手机号, 密码, 验证码
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.PhoneLogin'
       produces:
       - application/json
       responses:
         "200":
-          description: 生成验证码,返回包括随机数id,base64,验证码长度,是否开启验证码
+          description: 返回包括用户信息,token,过期时间
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_response.LoginResponse'
+                msg:
+                  type: string
+              type: object
+      summary: 社区用户手机号密码登录
+      tags:
+      - CommunityBase
+  /communityBase/register:
+    post:
+      parameters:
+      - description: 用户名, 昵称, 密码, 角色ID
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github.com_flipped-aurora_gin-vue-admin_server_model_community_request.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 用户注册账号,返回包括用户信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RegisterResponse'
+                msg:
+                  type: string
+              type: object
+      summary: 社区用户注册账号
+      tags:
+      - communityBase
+  /communityBase/sendCode:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 手机号
+        in: formData
+        name: phone
+        required: true
+        type: string
+      - description: 类型
+        in: formData
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 发送短信验证码
           schema:
             allOf:
             - $ref: '#/definitions/response.Response'
@@ -2700,7 +2770,7 @@ paths:
               type: object
       security:
       - ApiKeyAuth: []
-      summary: 生成验证码
+      summary: 发送短信验证码
       tags:
       - communityBase
   /communityUser/createCommunityUser:

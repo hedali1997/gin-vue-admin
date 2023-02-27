@@ -9,9 +9,9 @@ type UserResponse struct {
 }
 
 type LoginResponse struct {
-	User      community.CommunityUser `json:"user"`
-	Token     string                  `json:"token"`
-	ExpiresAt int64                   `json:"expiresAt"`
+	User      community.ApiCommunityUser `json:"user"`
+	Token     string                     `json:"token"`
+	ExpiresAt int64                      `json:"expiresAt"`
 }
 
 type RegisterResponse struct {

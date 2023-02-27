@@ -24,7 +24,7 @@ var communityUserService = service.ServiceGroupApp.CommunityServiceGroup.Communi
 
 // PhoneLogin
 // @Tags     CommunityBase
-// @Summary  社区用户登录
+// @Summary  社区用户手机号密码登录
 // @Produce   application/json
 // @Param    data  body      communityReq.PhoneLogin                                             true  "手机号, 密码, 验证码"
 // @Success  200   {object}  response.Response{data=communityRes.LoginResponse,msg=string}  "返回包括用户信息,token,过期时间"
@@ -71,7 +71,18 @@ func (b *CommunityBaseApi) PhoneLogin(c *gin.Context) {
 			response.FailWithMessage("用户被禁止登录", c)
 			return
 		}
-		b.TokenNext(c, *user)
+
+		// 前端接口仅返回必要的字段
+		var tempUser *community.ApiCommunityUser
+
+		err = utils.Copy(&tempUser, user)
+		if err != nil {
+			global.GVA_LOG.Error("获取用户信息失败!", zap.Error(err))
+			response.FailWithMessage("获取用户信息失败!", c)
+			return
+		}
+
+		b.TokenNext(c, *tempUser)
 		return
 	}
 	// 验证码次数+1
@@ -81,11 +92,11 @@ func (b *CommunityBaseApi) PhoneLogin(c *gin.Context) {
 
 // PhoneCodeLogin
 // @Tags     CommunityBase
-// @Summary  用户登录
+// @Summary  社区用户短信验证登录
 // @Produce   application/json
 // @Param    data  body      communityReq.PhoneCodeLogin                                    true  "手机号, 验证码"
 // @Success  200   {object}  response.Response{data=communityRes.LoginResponse,msg=string}  "返回包括用户信息,token,过期时间"
-// @Router   /communityBase/login [post]
+// @Router   /communityBase/codeLogin [post]
 func (b *CommunityBaseApi) PhoneCodeLogin(c *gin.Context) {
 	var l communityReq.PhoneCodeLogin
 	err := c.ShouldBindJSON(&l)
@@ -123,12 +134,23 @@ func (b *CommunityBaseApi) PhoneCodeLogin(c *gin.Context) {
 		response.FailWithMessage("用户被禁止登录", c)
 		return
 	}
-	b.TokenNext(c, *user)
+
+	// 前端接口仅返回必要的字段
+	var tempUser *community.ApiCommunityUser
+
+	err = utils.Copy(&tempUser, user)
+	if err != nil {
+		global.GVA_LOG.Error("获取用户信息失败!", zap.Error(err))
+		response.FailWithMessage("获取用户信息失败!", c)
+		return
+	}
+
+	b.TokenNext(c, *tempUser)
 	return
 }
 
 // TokenNext 登录以后签发jwt
-func (b *CommunityBaseApi) TokenNext(c *gin.Context, user community.CommunityUser) {
+func (b *CommunityBaseApi) TokenNext(c *gin.Context, user community.ApiCommunityUser) {
 	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
 	claims := j.CreateCommunityClaims(systemReq.CommunityBaseClaims{
 		UUID:     user.UUID,
@@ -187,7 +209,7 @@ func (b *CommunityBaseApi) TokenNext(c *gin.Context, user community.CommunityUse
 
 // Register
 // @Tags     communityBase
-// @Summary  用户注册账号
+// @Summary  社区用户注册账号
 // @Produce   application/json
 // @Param    data  body      communityReq.Register                                        true  "用户名, 昵称, 密码, 角色ID"
 // @Success  200   {object}  response.Response{data=communityRes.RegisterResponse,msg=string}  "用户注册账号,返回包括用户信息"
