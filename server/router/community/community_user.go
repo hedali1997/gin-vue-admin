@@ -1,27 +1,18 @@
 package community
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/api/v1"
-	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
+	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 	"github.com/gin-gonic/gin"
 )
 
 type CommunityUserRouter struct {
 }
 
-// InitCommunityUserRouter 初始化 CommunityUser 路由信息
-func (s *CommunityUserRouter) InitCommunityUserRouter(Router *gin.RouterGroup) {
-	communityUserRouter := Router.Group("communityUser").Use(middleware.OperationRecord())
-	communityUserRouterWithoutRecord := Router.Group("communityUser")
-	var communityUserApi = v1.ApiGroupApp.CommunityApiGroup.CommunityUserApi
+func (s *CommunityBaseRouter) InitCommunityUserRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
+	baseRouter := Router.Group("communityUser")
+	userApi := v1.ApiGroupApp.CommunityApiGroup.CommunityUserApi
 	{
-		communityUserRouter.POST("createCommunityUser", communityUserApi.CreateCommunityUser)             // 新建CommunityUser
-		communityUserRouter.DELETE("deleteCommunityUser", communityUserApi.DeleteCommunityUser)           // 删除CommunityUser
-		communityUserRouter.DELETE("deleteCommunityUserByIds", communityUserApi.DeleteCommunityUserByIds) // 批量删除CommunityUser
-		communityUserRouter.PUT("updateCommunityUser", communityUserApi.UpdateCommunityUser)              // 更新CommunityUser
+		baseRouter.POST("editUser", userApi.EditUser) // 修改个人信息
 	}
-	{
-		communityUserRouterWithoutRecord.GET("findCommunityUser", communityUserApi.FindCommunityUser)       // 根据ID获取CommunityUser
-		communityUserRouterWithoutRecord.GET("getCommunityUserList", communityUserApi.GetCommunityUserList) // 获取CommunityUser列表
-	}
+	return baseRouter
 }

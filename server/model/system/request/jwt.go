@@ -12,25 +12,12 @@ type CustomClaims struct {
 	jwt.StandardClaims
 }
 
-// Custom claims structure
-type CommunityCustomClaims struct {
-	CommunityBaseClaims
-	BufferTime int64
-	jwt.StandardClaims
-}
-
 type BaseClaims struct {
 	UUID        uuid.UUID
 	ID          uint
 	Username    string
+	Phone       string
 	NickName    string
 	AuthorityId uint
-}
-
-type CommunityBaseClaims struct {
-	UUID     uuid.UUID
-	ID       uint
-	Phone    string
-	NickName string
-	Status   uint8
+	Status      uint8
 }

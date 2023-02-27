@@ -25,6 +25,9 @@ func (communityUserService *CommunityUserService) Register(u community.Community
 		return userInter, errors.New("手机号已注册")
 	}
 
+	u.Sex = 3
+	u.Status = 1
+	u.Education = 1
 	// 否则 附加uuid 密码hash加密 注册
 	u.Password = utils.BcryptHash(u.Password)
 	u.UUID = uuid.NewV4()
@@ -36,8 +39,8 @@ func (communityUserService *CommunityUserService) Register(u community.Community
 //@author: [SliverHorn](https://github.com/SliverHorn)
 //@function: Login
 //@description: 用户登录
-//@param: u *model.SysUser
-//@return: err error, userInter *model.SysUser
+//@param: u *community.CommunityUser
+//@return: err error, userInter *community.CommunityUser
 
 func (communityUserService *CommunityUserService) Login(u *community.CommunityUser) (userInter *community.CommunityUser, err error) {
 	if nil == global.GVA_DB {
@@ -55,11 +58,21 @@ func (communityUserService *CommunityUserService) Login(u *community.CommunityUs
 	return &user, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
+func (communityUserService *CommunityUserService) CodeLogin(u *community.CommunityUser) (userInter *community.CommunityUser, err error) {
+	if nil == global.GVA_DB {
+		return nil, fmt.Errorf("db not init")
+	}
+
+	var user community.CommunityUser
+	err = global.GVA_DB.Where("phone = ?", u.Phone).First(&user).Error
+	return &user, err
+}
+
+//@author: [hedali](https://github.com/hedali1997)
 //@function: ChangePassword
-//@description: 修改用户密码
-//@param: u *model.SysUser, newPassword string
-//@return: userInter *model.SysUser,err error
+//@description: 修改社区用户密码
+//@param: u *community.CommunityUser, newPassword string
+//@return: userInter *community.CommunityUser,err error
 
 func (communityUserService *CommunityUserService) ChangePassword(u *community.CommunityUser, newPassword string) (userInter *community.CommunityUser, err error) {
 	var user community.CommunityUser
@@ -68,6 +81,40 @@ func (communityUserService *CommunityUserService) ChangePassword(u *community.Co
 	}
 	if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
 		return nil, errors.New("原密码错误")
+	}
+	user.Password = utils.BcryptHash(newPassword)
+	err = global.GVA_DB.Save(&user).Error
+	return &user, err
+}
+
+func (communityUserService *CommunityUserService) ChangeInfo(u *community.CommunityUser) (userInter *community.CommunityUser, err error) {
+	var user community.CommunityUser
+	if err = global.GVA_DB.Where("id = ?", u.ID).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	user.Avatar = u.Avatar
+	user.Nickname = u.Nickname
+	user.Sex = u.Sex
+	user.School = u.School
+	user.Education = u.Education
+	user.Major = u.Major
+
+	if u.Birthday != "" {
+		user.Birthday = u.Birthday
+	}
+
+	err = global.GVA_DB.Save(&user).Error
+	return &user, err
+}
+
+func (communityUserService *CommunityUserService) RecoverPassword(u *community.CommunityUser, newPassword string) (userInter *community.CommunityUser, err error) {
+	var user community.CommunityUser
+	if err = global.GVA_DB.Where("phone = ?", u.Phone).First(&user).Error; err != nil {
+		return nil, err
+	}
+	if user.ID == 0 {
+		return nil, errors.New("用户不存在")
 	}
 	user.Password = utils.BcryptHash(newPassword)
 	err = global.GVA_DB.Save(&user).Error

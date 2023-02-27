@@ -16,6 +16,7 @@ func (s *CommunityBaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRo
 		baseRouter.POST("register", baseApi.Register)
 		baseRouter.POST("captcha", baseApi.Captcha)
 		baseRouter.POST("sendCode", baseApi.SendCode)
+		baseRouter.POST("recoverPassword", baseApi.RecoverPassword)
 	}
 	return baseRouter
 }

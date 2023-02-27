@@ -119,12 +119,12 @@ func (b *CommunityBaseApi) PhoneCodeLogin(c *gin.Context) {
 	}
 
 	u := &community.CommunityUser{Phone: l.Phone}
-	user, err := userService.Login(u)
+	user, err := userService.CodeLogin(u)
 	if err != nil {
-		global.GVA_LOG.Error("登陆失败! 手机号不存在或者密码错误!", zap.Error(err))
+		global.GVA_LOG.Error("登陆失败! 手机号不存在!", zap.Error(err))
 		// 验证码次数+1
 		global.BlackCache.Increment(key, 1)
-		response.FailWithMessage("手机号不存在或者密码错误", c)
+		response.FailWithMessage("手机号不存在", c)
 		return
 	}
 	if user.Status == 2 {
@@ -152,14 +152,15 @@ func (b *CommunityBaseApi) PhoneCodeLogin(c *gin.Context) {
 // TokenNext 登录以后签发jwt
 func (b *CommunityBaseApi) TokenNext(c *gin.Context, user community.ApiCommunityUser) {
 	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
-	claims := j.CreateCommunityClaims(systemReq.CommunityBaseClaims{
+	claims := j.CreateClaims(systemReq.BaseClaims{
 		UUID:     user.UUID,
 		ID:       user.ID,
 		NickName: user.Nickname,
+		Username: user.UserName,
 		Phone:    user.Phone,
 		Status:   user.Status,
 	})
-	token, err := j.CreateCommunityToken(claims)
+	token, err := j.CreateToken(claims)
 	if err != nil {
 		global.GVA_LOG.Error("获取token失败!", zap.Error(err))
 		response.FailWithMessage("获取token失败", c)
@@ -263,14 +264,59 @@ func (b *CommunityBaseApi) Register(c *gin.Context) {
 	response.OkWithDetailed(communityRes.RegisterResponse{User: tempUser}, "注册成功", c)
 }
 
-// ChangePassword
+// RecoverPassword
 // @Tags      communityBase
+// @Summary   社区用户找回密码
+// @Security  ApiKeyAuth
+// @Produce  application/json
+// @Param     data  body      communityReq.RecoverPasswordReq    true  "手机号, 验证码, 新密码, 新密码"
+// @Success   200   {object}  response.Response{msg=string}  "社区用户找回密码"
+// @Router    /communityBase/recoverPassword [post]
+func (b *CommunityBaseApi) RecoverPassword(c *gin.Context) {
+	var req communityReq.RecoverPasswordReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(req, utils.RecoverPasswordVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	if req.Password != req.CheckPassword {
+		response.FailWithMessage("密码与确认密码不一致", c)
+		return
+	}
+
+	// 校验code
+	verifyRes := verifyCode(c, req.Phone, req.Code, "RecoverPassword")
+	if verifyRes.Code != 0 {
+		response.Result(verifyRes.Code, verifyRes.Data, verifyRes.Msg, c)
+		return
+	}
+
+	// 手机号找到用户，然后修改密码
+	u := &community.CommunityUser{Phone: req.Phone}
+
+	_, err = userService.RecoverPassword(u, req.Password)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败，"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
+}
+
+// ChangePassword
+// @Tags      communityUser
 // @Summary   社区用户修改密码
 // @Security  ApiKeyAuth
 // @Produce  application/json
 // @Param     data  body      communityReq.ChangePasswordReq    true  "用户名, 原密码, 新密码"
 // @Success   200   {object}  response.Response{msg=string}  "用户修改密码"
-// @Router    /communityBase/changePassword [post]
+// @Router    /communityUser/changePassword [post]
 func (b *CommunityBaseApi) ChangePassword(c *gin.Context) {
 	var req communityReq.ChangePasswordReq
 	err := c.ShouldBindJSON(&req)
@@ -283,7 +329,7 @@ func (b *CommunityBaseApi) ChangePassword(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	uid := utils.GetCommunityUserID(c)
+	uid := utils.GetUserID(c)
 	u := &community.CommunityUser{GVA_MODEL: global.GVA_MODEL{ID: uid}, Password: req.Password}
 	_, err = userService.ChangePassword(u, req.NewPassword)
 	if err != nil {
@@ -293,6 +339,51 @@ func (b *CommunityBaseApi) ChangePassword(c *gin.Context) {
 	}
 	response.OkWithMessage("修改成功", c)
 }
+
+// EditUser
+// @Tags      communityUser
+// @Summary   社区用户修改个人信息
+// @Security  ApiKeyAuth
+// @Produce  application/json
+// @Param     data  body      communityReq.EditUserReq    true  "头像，名称，性别，生日，学校，学历，专业"
+// @Success   200   {object}  response.Response{msg=string}  "社区用户修改个人信息"
+// @Router    /communityUser/EditUser [post]
+func (communityUserApi *CommunityUserApi) EditUser(c *gin.Context) {
+	var req communityReq.EditUserReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		global.GVA_LOG.Error("ShouldBindJSON!", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(req, utils.EditUser)
+	if err != nil {
+		global.GVA_LOG.Error("Verify!", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	uid := utils.GetUserID(c)
+	u := &community.CommunityUser{
+		GVA_MODEL: global.GVA_MODEL{ID: uid},
+		Avatar:    req.Avatar,
+		Nickname:  req.Nickname,
+		Birthday:  req.Birthday,
+		Sex:       req.Sex,
+		School:    req.School,
+		Education: req.Education,
+		Major:     req.Major,
+	}
+
+	_, err = userService.ChangeInfo(u)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败，"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
+}
+
+// 以下为后台接口 --------
 
 // CreateCommunityUser 创建CommunityUser
 // @Tags CommunityUser

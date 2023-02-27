@@ -71,10 +71,20 @@ func Routers() *gin.Engine {
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 
 	}
+
+	// 社区相关接口
+	LoginGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+	LoginGroup.Use(middleware.JWTAuth())
 	{
 		communityRouter := router.RouterGroupApp.Community
-		communityRouter.InitCommunityUserRouter(PrivateGroup)
+		// 后台接口
+		communityRouter.InitAdminCommunityUserRouter(PrivateGroup)
+
+		// 前端无需登录的接口
 		communityRouter.InitBaseRouter(PublicGroup)
+
+		// 前台需登录的接口
+		communityRouter.InitCommunityUserRouter(LoginGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

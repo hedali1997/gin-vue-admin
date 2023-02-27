@@ -68,7 +68,7 @@ func (b *CommunityBaseApi) Captcha(c *gin.Context) {
 // @accept    application/x-www-form-urlencoded
 // @Produce   application/json
 // @Param     phone  formData   string   true  "手机号"
-// @Param     type   formData   string   true  "类型：Register,PhoneCodeLogin"
+// @Param     type   formData   string   true  "类型：Register,PhoneCodeLogin,RecoverPassword"
 // @Success   200  {object}  response.Response{data=communityRes.CodeResponse,msg=string}  "发送短信验证码"
 // @Router    /communityBase/sendCode [post]
 func (b *CommunityBaseApi) SendCode(c *gin.Context) {

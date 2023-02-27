@@ -1,6 +1,7 @@
 package community
 
 type RouterGroup struct {
-	CommunityUserRouter
+	AdminCommunityUserRouter
 	CommunityBaseRouter
+	CommunityUserRouter
 }
