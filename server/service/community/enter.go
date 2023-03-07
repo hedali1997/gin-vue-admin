@@ -6,4 +6,5 @@ type ServiceGroup struct {
 	UserCollectPostService
 	UserFenService
 	UserStarPostService
+	UserViewPostService
 }

@@ -10,7 +10,7 @@ type UserStarPostService struct {
 }
 
 // Add 添加点赞
-func (userCollectPostService *UserStarPostService) Add(model community.UserStarPost) (ok bool, err error) {
+func (userStartPostService *UserStarPostService) Add(model community.UserStarPost) (ok bool, err error) {
 	var data community.UserStarPost
 	err = global.GVA_DB.Where("user_id = ?", model.UserId).Where("post_id = ?", model.PostId).First(&data).Error
 
@@ -23,7 +23,7 @@ func (userCollectPostService *UserStarPostService) Add(model community.UserStarP
 }
 
 // Del 移除点赞
-func (userCollectPostService *UserStarPostService) Del(model community.UserStarPost) (ok bool, err error) {
+func (userStartPostService *UserStarPostService) Del(model community.UserStarPost) (ok bool, err error) {
 	var data community.UserStarPost
 	err = global.GVA_DB.Where("user_id = ?", model.UserId).Where("post_id = ?", model.PostId).First(&data).Error
 	if err != nil {
