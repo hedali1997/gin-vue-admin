@@ -18,6 +18,9 @@ var (
 	AuthorityIdVerify      = Rules{"AuthorityId": {NotEmpty()}}
 	OldAuthorityVerify     = Rules{"OldAuthorityId": {NotEmpty()}}
 	ChangePasswordVerify   = Rules{"Password": {NotEmpty()}, "NewPassword": {NotEmpty()}}
+	UserBlockVerify        = Rules{"UserId": {NotEmpty()}, "BlockUserId": {NotEmpty()}}
+	CollectPostVerify      = Rules{"UserId": {NotEmpty()}, "PostId": {NotEmpty()}}
+	UserFenVerify          = Rules{"UserId": {NotEmpty()}, "FenUserId": {NotEmpty()}}
 	EditUser               = Rules{"Nickname": {NotEmpty()}, "Sex": {NotEmpty()}}
 	RecoverPasswordVerify  = Rules{"Phone": {NotEmpty()}, "Code": {NotEmpty()}, "Password": {NotEmpty()}, "CheckPassword": {NotEmpty()}}
 	SetUserAuthorityVerify = Rules{"AuthorityId": {NotEmpty()}}
